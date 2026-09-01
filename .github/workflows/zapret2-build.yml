@@ -43,12 +43,12 @@ jobs:
       - name: Copy package into SDK
         working-directory: /builder
         run: |
-          cp -vr $REPO_NAME ./package/$REPO_NAME/
+          cp -vr ${{ github.workspace }}/$REPO_NAME ./package/$REPO_NAME/
           # expose the package Makefile so OpenWrt discovers it as
           # $REPO_NAME/zapret2 (feed=$REPO_NAME, package=zapret2); REPO_ROOT
           # in the Makefile resolves to the repo root via ../..
           mkdir -p package/$REPO_NAME/zapret2
-          cp -v $REPO_NAME/openwrt/package/zapret2/Makefile package/$REPO_NAME/zapret2/Makefile
+          cp -v ${{ github.workspace }}/$REPO_NAME/openwrt/package/zapret2/Makefile package/$REPO_NAME/zapret2/Makefile
 
       - name: Init feeds
         working-directory: /builder
