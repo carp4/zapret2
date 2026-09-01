@@ -1,5 +1,5 @@
 name: build-zapret2-ipk
-run-name: Build zapret2 .ipk (${{ matrix.branch }}:${{ matrix.arch }})
+run-name: Build zapret2 .ipk (OpenWrt SDK)
 
 on:
   workflow_dispatch:
