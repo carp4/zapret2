@@ -43,7 +43,7 @@ define Package/zapret2
 	TITLE:=zapret2 - anti-DPI engine (nfqws2) with full runtime
 	SUBMENU:=Zapret
 	URL:=https://github.com/bol-van/zapret2
-	DEPENDS:=+libnetfilter-queue1 +libmnl0 +libcap +zlib +$(LUA_DEP)
+	DEPENDS:=+libnetfilter-queue +libmnl +libcap +zlib +$(LUA_DEP)
 endef
 
 define Package/zapret2/description
