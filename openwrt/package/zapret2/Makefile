@@ -13,7 +13,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=zapret2
-PKG_RELEASE:=1
+PKG_RELEASE:=16
 PKG_VERSION:=72
 
 REPO_ROOT:=$(CURDIR)/../..
@@ -43,7 +43,7 @@ define Package/zapret2
 	TITLE:=zapret2 - anti-DPI engine (nfqws2) with full runtime
 	SUBMENU:=Zapret
 	URL:=https://github.com/bol-van/zapret2
-	DEPENDS:=+libnetfilter-queue +libmnl +libcap +zlib +$(LUA_DEP)
+	DEPENDS:=+libnetfilter-queue +kmod-nfnetlink-queue +libmnl +libcap +zlib +$(LUA_DEP)
 endef
 
 define Package/zapret2/description
@@ -90,18 +90,37 @@ define Package/zapret2/install
 	$(CP) $(REPO_ROOT)/blockcheck2.d/* $(1)$(ZAPRET_DIR)/blockcheck2.d/
 	$(INSTALL_BIN) $(REPO_ROOT)/blockcheck2.sh $(1)$(ZAPRET_DIR)/blockcheck2.sh
 
+	# real-engine speed comparison backend (fast.com with/without + reference)
+	$(INSTALL_DIR) $(1)/usr/sbin
+	$(INSTALL_BIN) $(REPO_ROOT)/scripts/usr/sbin/zapret2-speedtest $(1)/usr/sbin/zapret2-speedtest
+
 	# default config
 	$(INSTALL_DATA) $(REPO_ROOT)/config.default $(1)$(ZAPRET_DIR)/config.default
 
 	# init scripts (procd) + firewall
 	$(INSTALL_DIR) $(1)$(ZAPRET_DIR)/init.d/openwrt
 	$(CP) $(REPO_ROOT)/init.d/openwrt/* $(1)$(ZAPRET_DIR)/init.d/openwrt/
+	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_BIN) $(REPO_ROOT)/init.d/openwrt/zapret2 $(1)/etc/init.d/zapret2
+	$(INSTALL_DIR) $(1)/etc/hotplug.d/iface
 	$(INSTALL_BIN) $(REPO_ROOT)/init.d/openwrt/90-zapret2 $(1)/etc/hotplug.d/iface/90-zapret2
 
 	# create runtime config from default on first boot
 	$(INSTALL_DIR) $(1)/etc/uci-defaults
 	$(INSTALL_BIN) $(REPO_ROOT)/openwrt/uci-defaults.zapret2 $(1)/etc/uci-defaults/99-zapret2-config
+endef
+
+define Package/zapret2/postinst
+#!/bin/sh
+# zapret2 installs DISABLED: the APK default_postinst enables+starts any
+# init script with START= on a LIVE install. Undo that so a freshly added
+# package doesn't run until the user opts in. (First boot of flashed
+# images is handled by uci-defaults/99-zapret2-config.)
+if [ -z "$${IPKG_INSTROOT}" ]; then
+	/etc/init.d/zapret2 disable 2>/dev/null
+	/etc/init.d/zapret2 stop 2>/dev/null || true
+fi
+exit 0
 endef
 
 $(eval $(call BuildPackage,zapret2))
