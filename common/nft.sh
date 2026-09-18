@@ -499,7 +499,7 @@ _nft_fw_nfqws_post4()
 		nft_print_op "$filter" "nfqws postrouting (qnum $port)" 4
 		rule="meta nfproto ipv4 $filter"
 		is_postnat && setmark="meta mark set meta mark or $DESYNC_MARK_POSTNAT"
-		nft_insert_rule $chain $rule $setmark $CONNMARKER $FW_EXTRA_POST queue num $port bypass
+		nft_insert_rule $chain $rule $setmark $CONNMARKER $FW_EXTRA_POST counter queue num $port bypass
 		nft_add_nfqws_flow_exempt_rule "$rule"
 		nft_activate_chain4 $chain daddr
 	}
@@ -515,7 +515,7 @@ _nft_fw_nfqws_post6()
 		nft_print_op "$filter" "nfqws postrouting (qnum $port)" 6
 		rule="meta nfproto ipv6 $filter"
 		is_postnat && setmark="meta mark set meta mark or $DESYNC_MARK_POSTNAT"
-		nft_insert_rule $chain $rule $setmark $CONNMARKER $FW_EXTRA_POST queue num $port bypass
+		nft_insert_rule $chain $rule $setmark $CONNMARKER $FW_EXTRA_POST counter queue num $port bypass
 		nft_add_nfqws_flow_exempt_rule "$rule"
 		nft_activate_chain6 $chain daddr
 	}
@@ -540,7 +540,7 @@ _nft_fw_nfqws_pre4()
 		local filter="$1" port="$2" rule chain=$(get_prechain)
 		nft_print_op "$filter" "nfqws prerouting (qnum $port)" 4
 		rule="meta nfproto ipv4 $filter"
-		nft_insert_rule $chain $rule $CONNMARKER $FW_EXTRA_POST queue num $port bypass
+		nft_insert_rule $chain $rule $CONNMARKER $FW_EXTRA_POST counter queue num $port bypass
 		nft_activate_chain4 $chain saddr
 	}
 }
@@ -554,7 +554,7 @@ _nft_fw_nfqws_pre6()
 		local filter="$1" port="$2" rule chain=$(get_prechain)
 		nft_print_op "$filter" "nfqws prerouting (qnum $port)" 6
 		rule="meta nfproto ipv6 $filter"
-		nft_insert_rule $chain $rule $CONNMARKER $FW_EXTRA_POST queue num $port bypass
+		nft_insert_rule $chain $rule $CONNMARKER $FW_EXTRA_POST counter queue num $port bypass
 		nft_activate_chain6 $chain saddr
 	}
 }
